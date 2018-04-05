@@ -5,9 +5,9 @@
    The default behavior is to syncronize (add and remove) members from the AAD-group to the Team group. 
    Note that this is a function and need to be imported first (.\Sync-AADGroupMembersWithTeams.ps1)
 .EXAMPLE
-   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomName' 
+   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomGroup' 
 .EXAMPLE
-   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomName' -OnlyAdd -Cred $Credentials
+   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomGroup' -OnlyAdd -Cred $Credentials
 .NOTES
    To use this function make sure to have both the Teams Module and MSOnline Module installed.
 #>
