@@ -1,4 +1,4 @@
-﻿<#
+<#
 .Synopsis
    A function for syncing a AAD-group members with a Microsoft Team
 .DESCRIPTION
@@ -9,7 +9,7 @@
 .EXAMPLE
    Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomName' -OnlyAdd -Cred $Credentials
 .NOTES
-   To use this funcetion script make sure to have both the Teams Module and MSOnline Module installed.
+   To use this function make sure to have both the Teams Module and MSOnline Module installed.
 #>
 function Sync-AADGroupMembersWithTeam
 {
