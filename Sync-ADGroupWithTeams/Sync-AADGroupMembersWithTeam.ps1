@@ -103,7 +103,7 @@ function Sync-AADGroupMembersWithTeam
         if ($TeamGroups.Count -gt 1) #More than 1 group found, trying to exact match
         {
             $TeamGroupID =  $TeamGroups | ? DisplayName -eq $TeamName | Select ObjectID
-            if (!$TeamGroupID)
+            if (!$TeamGroupID -or $TeamGroupID.count -gt 1)
             {
                 throw "More than one Azure Group fond for $TeamName and could not get an exact match"
             }
@@ -122,7 +122,7 @@ function Sync-AADGroupMembersWithTeam
         if ($AADGroups.Count -gt 1) #More than 1 group found, trying to exact match
         {
             $AADGroupID =  $AADGroups | ? DisplayName -eq $AADGroupName | Select ObjectID
-            if (!$AADGroupID)
+            if (!$AADGroupID -or $AADGroupID.count -gt 1)
             {
                 throw "More than one Azure Group fond for $AADGroupName and could not get an exact match"
             }
