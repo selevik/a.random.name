@@ -5,19 +5,18 @@
    The default behavior is to syncronize (add and remove) members from the AAD-group to the Team group. 
    Note that this is a function and need to be imported first (.\Sync-AADGroupMembersWithTeams.ps1)
 .EXAMPLE
-   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomGroup' 
+   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomName' 
 .EXAMPLE
-   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomGroup' -OnlyAdd -Cred $Credentials
+   Sync-AADGroupMembersWithTeams -TeamName 'A Random Name' -AADGroupName 'aRandomName' -OnlyAdd -Cred $Credentials
 .NOTES
-   To use this function make sure to have both the Teams Module and MSOnline Module installed.
+   To use this funcetion script make sure to have both the Teams Module and MSOnline Module installed.
 #>
 function Sync-AADGroupMembersWithTeam
 {
     [CmdletBinding(SupportsShouldProcess=$true, 
                   PositionalBinding=$false,
                   HelpUri = 'https://a.random.name')]
-    Param
-    (
+    param(
         # The name of the Team you want to sync members to
         [Parameter(Mandatory=$true, 
                    ValueFromPipeline=$true,
@@ -103,7 +102,7 @@ function Sync-AADGroupMembersWithTeam
         if ($TeamGroups.Count -gt 1) #More than 1 group found, trying to exact match
         {
             $TeamGroupID =  $TeamGroups | ? DisplayName -eq $TeamName | Select ObjectID
-            if (!$TeamGroupID -or $TeamGroupID.count -gt 1)
+            if (!$TeamGroupID)
             {
                 throw "More than one Azure Group fond for $TeamName and could not get an exact match"
             }
@@ -122,7 +121,7 @@ function Sync-AADGroupMembersWithTeam
         if ($AADGroups.Count -gt 1) #More than 1 group found, trying to exact match
         {
             $AADGroupID =  $AADGroups | ? DisplayName -eq $AADGroupName | Select ObjectID
-            if (!$AADGroupID -or $AADGroupID.count -gt 1)
+            if (!$AADGroupID)
             {
                 throw "More than one Azure Group fond for $AADGroupName and could not get an exact match"
             }
@@ -160,35 +159,35 @@ function Sync-AADGroupMembersWithTeam
                     throw "Could not add user $upn to the team $TeamName, error: $_"
                 }
             }
-        
-            if (!$OnlyAdd) #then perform removes aswell. Bare in mind that you cannot remove the last administrator. 
-            {
-                foreach ($objectId in $Comparison.RemoveFromReference)
-                {
-                    try
-                    {
-                        $upn = Get-MsolUser -ObjectId $objectId | select -ExpandProperty userPrincipalName 
-                        if ($TestRun)
-                        {
-                            Write-Host "Would have: Remove-TeamUser -GroupId $TeamGroupID -User $upn" -ForegroundColor Gray 
-                        }
-                        else
-                        {
-                            Remove-TeamUser -GroupId $TeamGroupID -User $upn
-                        }
-                        #implement logging here
-                        Write-Host "Sucessfully removed $upn from $TeamName"
-                    }
-                    catch
-                    {
-                        throw "Could not remove user $upn from team $TeamName, error: $_"
-                    }
-                }
-            }   
-        }
-        else
+        }     
+
+        if (!$OnlyAdd -and $Comparison.RemoveFromReference.count -gt 0) #then perform removes aswell. Bare in mind that you cannot remove the last administrator. 
         {
-            Write-host "Nothing to do, the Group and Team is already synced"
+            foreach ($objectId in $Comparison.RemoveFromReference)
+            {
+                try
+                {
+                    $upn = Get-MsolUser -ObjectId $objectId | select -ExpandProperty userPrincipalName 
+                    if ($TestRun)
+                    {
+                        Write-Host "Would have: Remove-TeamUser -GroupId $TeamGroupID -User $upn" -ForegroundColor Gray 
+                    }
+                    else
+                    {
+                        Remove-TeamUser -GroupId $TeamGroupID -User $upn
+                    }
+                    #implement logging here
+                    Write-Host "Sucessfully removed $upn from $TeamName"
+                }
+                catch
+                {
+                    throw "Could not remove user $upn from team $TeamName, error: $_"
+                }
+            }
+        } 
+        if ($Comparison.AddToReference.count -eq 0 -and $Comparison.RemoveFromReference.count -eq 0)
+        {
+            Write-host "Nothing to do, the Group and Team is already synced"          
         }    
     }
     End
